@@ -1,0 +1,40 @@
+services:
+  aerospike-node-1:
+    build:
+      context: .
+      platforms:
+        - linux/amd64
+        - linux/arm64
+      dockerfile: database.Dockerfile
+    container_name: aerospike-node-1
+    stdin_open: true
+    tty: true
+    networks:
+      - devops-net
+
+  aerospike-node-2:
+    build:
+      context: .
+      platforms:
+        - linux/amd64
+        - linux/arm64
+      dockerfile: database.Dockerfile
+    container_name: aerospike-node-2
+    stdin_open: true
+    tty: true
+    networks:
+      - devops-net
+
+  aerospike-client:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: aerospike-client
+    stdin_open: true
+    tty: true
+    networks:
+      - devops-net
+
+networks:
+  devops-net:
+    name: devops-net
