@@ -349,10 +349,28 @@ docker exec -it aerospike-client bash
 
 4. Cleanup:  
    Once the workshop is complete, stop and remove all containers.  
+
+   ### Stop All Containers
+
    ```bash
-   docker compose down
+   docker-compose stop
    ```
 
+   ### Stop and Remove Containers
+
+   ```bash
+   docker-compose down
+   ```
+
+   ### Remove Everything (Including Data)
+
+   ```bash
+   # Remove containers, networks, and volumes
+   docker-compose down -v
+
+   # Also remove images
+   docker-compose down -v --rmi all
+   ```
 ---
 
 ## Additional Resources
