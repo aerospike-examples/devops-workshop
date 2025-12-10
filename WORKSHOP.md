@@ -40,7 +40,7 @@ This repository provides a Docker-based environment to learn how to install, con
 │  │  3000 (service) │  │  3000 (service) │  │  3000 (service) │              │
 │  │  3001 (fabric)  │  │  3001 (fabric)  │  │  3001 (fabric)  │              │
 │  │  3002 (mesh)    │  │  3002 (mesh)    │  │  3002 (mesh)    │              │
-│  │  3003 (info)    │  │  3003 (info)    │  │  3003 (info)    │              │
+│  │  3003 (admin)   │  │  3003 (admin)   │  │  3003 (admin)   │              │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘              │
 │           │                    │                    │                       │
 │           └────────────────────┼────────────────────┘                       │
@@ -73,7 +73,7 @@ This repository provides a Docker-based environment to learn how to install, con
 | 3000 | TCP | Client service port (queries) |
 | 3001 | TCP | Fabric port (intra-cluster) |
 | 3002 | TCP | Heartbeat/Mesh port (cluster discovery) |
-| 3003 | TCP | Info port (management) |
+| 3003 | TCP | admin port (management) |
 
 ---
 
