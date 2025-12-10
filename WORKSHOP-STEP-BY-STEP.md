@@ -209,8 +209,8 @@ docker exec -it aerospike-client bash
 
 4. Repeat Installation for All Nodes:  
    Important: Repeat the steps (2 through 8) for aerospike-node-2 and aerospike-node-3 to simulate the full installation process across the cluster.  
-   * docker compose exec aerospike-node-2 /bin/bash  
-   * docker compose exec aerospike-node-3 /bin/bash  
+   * `docker compose exec aerospike-node-2 /bin/bash`
+   * `docker compose exec aerospike-node-3 /bin/bash`
 
 5. Check the logs for cluster re-formation (from host):  
    Wait a moment after installing the last node, and then confirm the cluster successfully stabilizes.  
