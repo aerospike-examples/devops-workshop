@@ -12,7 +12,8 @@ This repository provides a Docker-based environment to learn how to install, con
    4.2 [Lab 2: Diagnosis with asadm](#lab-2-diagnostics-with-asadm) \
    4.3 [Lab 3: Loading Data](#lab-3-data-load--workload) \
    4.4 [Lab 4: Failure and scaling down](#lab-4-node-removal-scale-down) \
-   4.5 [Lab 5: Recovery and Scaling up](#lab-5-node-addition-scale-up) 
+   4.5 [Lab 5: Recovery and Scaling up](#lab-5-node-addition-scale-up)
+5. [Cleanup](#cleanup)
 
 ---
 
@@ -347,7 +348,7 @@ docker exec -it aerospike-client bash
    ```
    ***Discussion:** The cluster_size should return to 3. Watch the migrate\rx and migrate_tx counters. Aerospike automatically initiates **migrations** to restore the replication-factor 2 redundancy. The counters will increase until the migration is complete.  
 
-4. Cleanup:  
+## **Cleanup:**
    Once the workshop is complete, stop and remove all containers.  
 
    ### Stop All Containers
@@ -396,5 +397,4 @@ docker exec -it aerospike-client bash
 | Start Aerospike | `sudo systemctl start aerospike` |
 | Stop Aerospike | `sudo systemctl stop aerospike` |
 | Check cluster | `asadm -h aerospike-node-1:3000` |
-| Run benchmark | `asbench -c ~/asbench-configs/insert-1m-records.yaml` |
 
