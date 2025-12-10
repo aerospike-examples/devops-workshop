@@ -24,11 +24,11 @@ This repository provides a Docker-based environment to learn how to install, con
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                        Docker Network: devops-net                           │
-│                         Subnet: 172.20.0.0/16                               │
+│                         Subnet: 172.120.0.0/16                              │
 │                                                                             │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
 │  │ aerospike-node-1│  │ aerospike-node-2│  │ aerospike-node-3│              │
-│  │   172.20.0.11   │  │   172.20.0.12   │  │   172.20.0.13   │              │
+│  │   172.120.0.11  │  │   172.120.0.12  │  │   172.120.0.13  │              │
 │  │                 │  │                 │  │                 │              │
 │  │  Ubuntu 24.04   │  │  Ubuntu 24.04   │  │  Ubuntu 24.04   │              │
 │  │  + systemd      │  │  + systemd      │  │  + systemd      │              │
@@ -47,7 +47,7 @@ This repository provides a Docker-based environment to learn how to install, con
 │                                │                                            │
 │                    ┌───────────┴───────────┐                                │
 │                    │   aerospike-client    │                                │
-│                    │     172.20.0.20       │                                │
+│                    │     172.120.0.20      │                                │
 │                    │                       │                                │
 │                    │     Ubuntu 24.04      │                                │
 │                    │     + systemd         │                                │
@@ -59,12 +59,12 @@ This repository provides a Docker-based environment to learn how to install, con
 
 ### Component Summary
 
-| Node | Hostname | IP Address | Purpose |
-|------|----------|------------|---------|
-| Database 1 | aerospike-node-1 | 172.20.0.11 | Aerospike server (cluster member) |
-| Database 2 | aerospike-node-2 | 172.20.0.12 | Aerospike server (cluster member) |
-| Database 3 | aerospike-node-3 | 172.20.0.13 | Aerospike server (cluster member) |
-| Client | aerospike-client | 172.20.0.20 | Tools, benchmarking, client operations |
+| Node | Hostname | IP Address  | Purpose |
+|------|----------|-------------|---------|
+| Database 1 | aerospike-node-1 | 172.120.0.11 | Aerospike server (cluster member) |
+| Database 2 | aerospike-node-2 | 172.120.0.12 | Aerospike server (cluster member) |
+| Database 3 | aerospike-node-3 | 172.120.0.13 | Aerospike server (cluster member) |
+| Client | aerospike-client | 172.120.0.20 | Tools, benchmarking, client operations |
 
 ### Port Reference
 
@@ -182,6 +182,7 @@ docker exec -it aerospike-client bash
 - Pre-configured `/etc/aerospike/aerospike.conf`
 - Common utilities (vim, nano, curl, wget, etc.)
 - User: `aero_devops` with sudo access
+- Aerospike downloaded package (not installed)
 
 **Client Node (aerospike-client):**
 - Ubuntu 24.04 with systemd
@@ -202,11 +203,13 @@ devops-workshop/
 │       ├── aerospike.conf      # Aerospike configuration
 │       └── features.conf       # License key (Enterprise Edition)
 ├── asbench-configs/
-│   ├── insert-1m-records.yaml  # Insert 1M records workload
-│   └── read-write-workload.yaml # Mixed read/write workload
+│   ├── insert-1m-records.sh     # Insert 1M records workload script
+│   ├── insert-1m-records.yaml   # Insert 1M records workload config
+│   ├── read-write-workload.sh   # Mixed read/write workload script
+│   └── read-write-workload.yaml # Mixed read/write workload config
 ├── shared/                # Shared folder across all containers
 ├── package/               # Aerospike installation packages
-└── WORKSHOP.md           # This documentation
+└── WORKSHOP.md            # This documentation
 ```
 
 ### Shared Folders
@@ -419,7 +422,7 @@ asinfo -h aerospike-node-1:3000 -v "build"
 asinfo -h aerospike-node-1:3000 -v "namespaces"
 ```
 
-### aql (Query Language)
+### aql (Query Interface)
 
 ```bash
 # Connect to cluster
@@ -449,53 +452,19 @@ Two asbench configurations are included:
 docker exec -it aerospike-client bash
 
 # Run the insert workload
-asbench -c ~/asbench-configs/insert-1m-records.yaml
+asbench-configs/insert-1m-records.sh
 ```
 
 ### Run Mixed Workload
 
 ```bash
-asbench -c ~/asbench-configs/read-write-workload.yaml
+# On the client node
+docker exec -it aerospike-client bash
+
+asbench-configs/read-write-workload.sh
 ```
-
-### Custom Benchmark Options
-
-```bash
-# Override hosts
-asbench -c ~/asbench-configs/insert-1m-records.yaml --hosts aerospike-node-1:3000
-
-# Change thread count
-asbench -c ~/asbench-configs/insert-1m-records.yaml --threads 32
-
-# Limit duration
-asbench -c ~/asbench-configs/insert-1m-records.yaml --duration 60
-```
-
----
 
 ## Customization Guide
-
-### Adding a New asbench Script
-
-1. **Create the configuration file on your host:**
-
-   ```bash
-   # Copy an existing template
-   cp asbench-configs/insert-1m-records.yaml asbench-configs/my-custom-workload.yaml
-   
-   # Edit the file
-   nano asbench-configs/my-custom-workload.yaml
-   ```
-
-2. **The file is automatically available in the container** (via volume mount):
-
-   ```bash
-   docker exec -it aerospike-client bash
-   ls ~/asbench-configs/
-   asbench -c ~/asbench-configs/my-custom-workload.yaml
-   ```
-
-3. **No rebuild required!** The `asbench-configs/` folder is mounted as a volume.
 
 ### Switching Between Community and Enterprise Edition
 
@@ -697,7 +666,7 @@ docker-compose up -d
      stop_signal: SIGRTMIN+3
      networks:
        devops-net:
-         ipv4_address: 172.20.0.14
+         ipv4_address: 172.120.0.14
    ```
 
 2. **Add the volume:**
