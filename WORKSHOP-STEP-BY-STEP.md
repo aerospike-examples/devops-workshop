@@ -270,7 +270,17 @@ docker exec -it aerospike-client bash
    asadm> exit
    ```
 
-4. **Generate Read/Write Workload:** Execute the script to start a continuous, mixed read/write workload (66% Read / 34% Update). **Keep this terminal window open.**  
+4. Sample the Data:  
+   Sample some data to see how the records look like.
+
+   ```bash
+   docker compose exec aerospike-client aql -h aerospike-node-1 
+   aql> set output raw
+   sql> select * from devops.testset limit 5
+   aql> exit
+   ```
+
+5. **Generate Read/Write Workload:** Execute the script to start a continuous, mixed read/write workload (66% Read / 34% Update). **Keep this terminal window open.**  
    docker compose exec aerospike-client /bin/bash
 
    *Run the script inside the opened shell:*  
@@ -280,7 +290,7 @@ docker exec -it aerospike-client bash
 
    **Keep Workload Running:** This workload will serve as the continuous background load for the next labs.
 
-5. **Show the Throughput on the Servers:**
+6. **Show the Throughput on the Servers:**
    ```bash
    docker compose exec aerospike-client asadm -h aerospike-node-1 
    asadm> watch show latencies
