@@ -256,7 +256,7 @@ docker exec -it aerospike-client bash
 2. Insert Data (1 Million Records):  
    Execute the pre-staged script to run asbench for initial data load.  
 ```bash
-   /asbench-configs/insert-1m-records.sh
+   ./asbench-configs/insert-1m-records.sh
 ```
 
 **Note:** This script inserts 1,000,000 records. Observe the throughput (Ops/sec) as data is loaded.  
@@ -275,7 +275,7 @@ docker exec -it aerospike-client bash
 
    *Run the script inside the opened shell:*  
 ```bash
-   /asbench-configs/read-write-workload.sh 
+   ./asbench-configs/read-write-workload.sh 
 ```
 
    **Keep Workload Running:** This workload will serve as the continuous background load for the next labs.
