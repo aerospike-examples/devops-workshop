@@ -1,43 +1,192 @@
+# =============================================================================
+# Aerospike DevOps Workshop - Docker Compose Configuration
+# =============================================================================
+# This compose file creates 4 VM-like containers:
+#   - 3 Database nodes (aerospike-node-1, aerospike-node-2, aerospike-node-3)
+#   - 1 Client node (aerospike-client)
+#
+# All containers:
+#   - Run Ubuntu 24.04 with systemd (supports systemctl commands)
+#   - Are networked together on a private subnet
+#   - Have host-mapped folders for data persistence
+#   - Stay running until explicitly stopped
+#
+# Aerospike Edition:
+#   Default: Community Edition (no license required)
+#   For Enterprise: Set AEROSPIKE_EDITION=enterprise before building
+#                   and place your package in package/enterprise/
+# =============================================================================
+
+# Default to Community Edition - override with: export AEROSPIKE_EDITION=enterprise
+x-aerospike-build: &aerospike-build
+  context: .
+  dockerfile: database.Dockerfile
+  args:
+    AEROSPIKE_EDITION: ${AEROSPIKE_EDITION:-community}
+
 services:
+  # ---------------------------------------------------------------------------
+  # Database Node 1
+  # ---------------------------------------------------------------------------
   aerospike-node-1:
     build:
-      context: .
-      platforms:
-        - linux/amd64
-        - linux/arm64
-      dockerfile: database.Dockerfile
+      <<: *aerospike-build
     container_name: aerospike-node-1
+    hostname: aerospike-node-1
+    
+    # Required for systemd to work
     privileged: true
+    
+    # Keep container running
     stdin_open: true
     tty: true
+    
+    # Cgroup configuration for systemd
+    cgroup_parent: ""
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      # Host-mapped folders
+      - ./shared:/home/aero_devops/shared
+      # Config files staged here - copy to /etc/aerospike after installation
+      - ./etc/aerospike:/home/aero_devops/aerospike-config:ro
+      - node1-data:/opt/aerospike/data
+    
+    # Stop signal for systemd
+    stop_signal: SIGRTMIN+3
+    
     networks:
-      - devops-net
+      devops-net:
+        ipv4_address: 172.20.0.11
+    
+    # Expose ports to host (optional - uncomment if needed)
+    # ports:
+    #   - "3001:3000"   # Service port
+    #   - "3011:3001"   # Fabric port  
+    #   - "3021:3002"   # Heartbeat port
+    #   - "3031:3003"   # Info port
 
+  # ---------------------------------------------------------------------------
+  # Database Node 2
+  # ---------------------------------------------------------------------------
   aerospike-node-2:
     build:
-      context: .
-      platforms:
-        - linux/amd64
-        - linux/arm64
-      dockerfile: database.Dockerfile
+      <<: *aerospike-build
     container_name: aerospike-node-2
+    hostname: aerospike-node-2
     privileged: true
     stdin_open: true
     tty: true
+    cgroup_parent: ""
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./shared:/home/aero_devops/shared
+      # Config files staged here - copy to /etc/aerospike after installation
+      - ./etc/aerospike:/home/aero_devops/aerospike-config:ro
+      - node2-data:/opt/aerospike/data
+    stop_signal: SIGRTMIN+3
     networks:
-      - devops-net
+      devops-net:
+        ipv4_address: 172.20.0.12
+    # ports:
+    #   - "3002:3000"
+    #   - "3012:3001"
+    #   - "3022:3002"
+    #   - "3032:3003"
 
+  # ---------------------------------------------------------------------------
+  # Database Node 3
+  # ---------------------------------------------------------------------------
+  aerospike-node-3:
+    build:
+      <<: *aerospike-build
+    container_name: aerospike-node-3
+    hostname: aerospike-node-3
+    privileged: true
+    stdin_open: true
+    tty: true
+    cgroup_parent: ""
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./shared:/home/aero_devops/shared
+      # Config files staged here - copy to /etc/aerospike after installation
+      - ./etc/aerospike:/home/aero_devops/aerospike-config:ro
+      - node3-data:/opt/aerospike/data
+    stop_signal: SIGRTMIN+3
+    networks:
+      devops-net:
+        ipv4_address: 172.20.0.13
+    # ports:
+    #   - "3003:3000"
+    #   - "3013:3001"
+    #   - "3023:3002"
+    #   - "3033:3003"
+
+  # ---------------------------------------------------------------------------
+  # Client Node (with Aerospike Tools and asbench)
+  # ---------------------------------------------------------------------------
   aerospike-client:
     build:
       context: .
       dockerfile: client.Dockerfile
     container_name: aerospike-client
+    hostname: aerospike-client
     privileged: true
     stdin_open: true
     tty: true
+    cgroup_parent: ""
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./shared:/home/aero_devops/shared
+      - ./asbench-configs:/home/aero_devops/asbench-configs
+    stop_signal: SIGRTMIN+3
     networks:
-      - devops-net
+      devops-net:
+        ipv4_address: 172.20.0.20
+    depends_on:
+      - aerospike-node-1
+      - aerospike-node-2
+      - aerospike-node-3
 
+# =============================================================================
+# Network Configuration
+# =============================================================================
+# Custom bridge network with fixed subnet
+# All containers can communicate freely on this network
+# Containers can reach each other by hostname or IP address
 networks:
   devops-net:
     name: devops-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+
+# =============================================================================
+# Persistent Volumes
+# =============================================================================
+# Named volumes for Aerospike data persistence
+volumes:
+  node1-data:
+    name: aerospike-node1-data
+  node2-data:
+    name: aerospike-node2-data
+  node3-data:
+    name: aerospike-node3-data
