@@ -57,6 +57,7 @@ RUN apt-get update -y && \
         build-essential \
         vim \
         nano \
+        less \
         iproute2 \
         iputils-ping \
         net-tools \

@@ -60,7 +60,7 @@ services:
     
     networks:
       devops-net:
-        ipv4_address: 172.20.0.11
+        ipv4_address: 172.120.0.11
     
     # Expose ports to host (optional - uncomment if needed)
     # ports:
@@ -94,7 +94,7 @@ services:
     stop_signal: SIGRTMIN+3
     networks:
       devops-net:
-        ipv4_address: 172.20.0.12
+        ipv4_address: 172.120.0.12
     # ports:
     #   - "3002:3000"
     #   - "3012:3001"
@@ -126,7 +126,7 @@ services:
     stop_signal: SIGRTMIN+3
     networks:
       devops-net:
-        ipv4_address: 172.20.0.13
+        ipv4_address: 172.120.0.13
     # ports:
     #   - "3003:3000"
     #   - "3013:3001"
@@ -157,7 +157,7 @@ services:
     stop_signal: SIGRTMIN+3
     networks:
       devops-net:
-        ipv4_address: 172.20.0.20
+        ipv4_address: 172.120.0.20
     depends_on:
       - aerospike-node-1
       - aerospike-node-2
@@ -176,8 +176,8 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
+        - subnet: 172.120.0.0/16
+          gateway: 172.120.0.1
 
 # =============================================================================
 # Persistent Volumes
