@@ -20,7 +20,7 @@ WORKDIR /home/${WORKSHOP_USER}
 # basic setup
 RUN mkdir -p /var/log/aerospike /var/run/aerospike /etc/aerospike && \
     apt-get update -y && \
-    apt-get install -y --no-install-recommends wget curl software-properties-common build-essential vim nano && \
+    apt-get install -y --no-install-recommends wget curl software-properties-common build-essential vim nano less && \
     apt-get autoremove -y --purge && \
     rm -rf /var/lib/apt/lists/*
 

@@ -7,6 +7,7 @@ services:
         - linux/arm64
       dockerfile: database.Dockerfile
     container_name: aerospike-node-1
+    privileged: true
     stdin_open: true
     tty: true
     networks:
@@ -20,6 +21,7 @@ services:
         - linux/arm64
       dockerfile: database.Dockerfile
     container_name: aerospike-node-2
+    privileged: true
     stdin_open: true
     tty: true
     networks:
@@ -30,6 +32,7 @@ services:
       context: .
       dockerfile: client.Dockerfile
     container_name: aerospike-client
+    privileged: true
     stdin_open: true
     tty: true
     networks:
