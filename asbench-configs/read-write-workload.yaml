@@ -1,78 +1,12 @@
-# =============================================================================
-# asbench Configuration: Mixed Read/Write Workload
-# =============================================================================
-# This configuration runs a mixed read/write workload against existing data.
-# Use this AFTER running the insert-1m-records.yaml configuration.
-#
-# Workload: 80% reads, 20% updates (typical production pattern)
-#
-# Usage:
-#   asbench -c /path/to/read-write-workload.yaml
-# =============================================================================
+- stage: 1
+# required arguments
+  workload: RU,66
 
-# Cluster connection settings
-hosts: "aerospike-node-1:3000,aerospike-node-2:3000,aerospike-node-3:3000"
+# optional arguments
+  duration: 86400
+  tps: 6000
+  object-spec: I,S32,I,S64,D,I,S16,B128,I,S48,D,I,S24,B64,I,S32,D,I,S16,I
 
-# Target namespace and set (must match insert config)
-namespace: "devops"
-set: "workshop_data"
-
-# Key range (should match inserted data)
-keys: 1000000
-
-# Workload configuration - Read/Update mix
-# RU = Read/Update workload
-# The percentage after comma is read percentage
-workload: "RU,80"
-
-# Duration to run (in seconds) - 0 means run indefinitely until stopped
-duration: 300
-
-# Number of concurrent threads
-threads: 32
-
-# Throughput limit (0 = unlimited)
-throughput: 0
-
-# Transaction timeout in milliseconds
-timeout: 1000
-
-# Socket timeout in milliseconds
-socket-timeout: 30000
-
-# Match the object spec from insert configuration
-object-spec: >-
-  I,
-  S:32,
-  I,
-  S:64,
-  D,
-  I,
-  S:16,
-  B:128,
-  I,
-  S:48,
-  D,
-  I,
-  S:24,
-  B:64,
-  I,
-  S:32,
-  D,
-  I,
-  S:16,
-  I
-
-# -----------------------------------------------------------------------------
-# Optional: Progress and reporting
-# -----------------------------------------------------------------------------
-
-# Print progress every N seconds
-# report-interval: 1
-
-# Latency histogram columns
-latency-columns: 4
-
-# Latency shift
-latency-shift: 3
+  key-start: 0
+  key-end: 1000000
 

@@ -1,115 +1,14 @@
-# =============================================================================
-# asbench Configuration: Insert 1 Million Records with 20 Fields
-# =============================================================================
-# This configuration inserts 1,000,000 records into the Aerospike cluster.
-# Each record contains 20 bins (fields) of various data types to simulate
-# a realistic workload.
-#
-# Usage:
-#   asbench -c /path/to/insert-1m-records.yaml
-#
-# Or run with command line override:
-#   asbench -c /path/to/insert-1m-records.yaml --hosts aerospike-node-1:3000
-# =============================================================================
+- stage: 1
+# required arguments
+  workload: I
 
-# Cluster connection settings
-hosts: "aerospike-node-1:3000,aerospike-node-2:3000,aerospike-node-3:3000"
+# optional arguments
+  duration: 86400
+  tps: 0
+  object-spec: I,S32,I,S64,D,I,S16,B128,I,S48,D,I,S24,B64,I,S32,D,I,S16,I
 
-# Target namespace and set
-namespace: "devops"
-set: "workshop_data"
+  key-start: 0
+  key-end: 1000000
 
-# Number of keys (records) to insert
-keys: 1000000
-
-# Workload configuration - 100% writes for initial data load
-workload: "I"   # I = Insert only
-
-# Number of concurrent threads
-threads: 16
-
-# Throughput limit (0 = unlimited)
-throughput: 0
-
-# Transaction timeout in milliseconds
-timeout: 1000
-
-# Socket timeout in milliseconds  
-socket-timeout: 30000
-
-# -----------------------------------------------------------------------------
-# Bin (Field) Definitions - 20 fields of various types
-# -----------------------------------------------------------------------------
-# Format: bin_name:data_type:size (for strings/bytes)
-#
-# Data Types:
-#   I  = Integer (64-bit signed)
-#   S  = String 
-#   B  = Bytes (blob)
-#   D  = Double (floating point)
-#   IB = Integer range (min:max)
-#   SB = String with fixed size
-# -----------------------------------------------------------------------------
-
-object-spec: >-
-  I,
-  S:32,
-  I,
-  S:64,
-  D,
-  I,
-  S:16,
-  B:128,
-  I,
-  S:48,
-  D,
-  I,
-  S:24,
-  B:64,
-  I,
-  S:32,
-  D,
-  I,
-  S:16,
-  I
-
-# Human-readable field mapping:
-# Bin 1:  user_id        - Integer
-# Bin 2:  username       - String (32 chars)
-# Bin 3:  account_type   - Integer  
-# Bin 4:  email          - String (64 chars)
-# Bin 5:  balance        - Double
-# Bin 6:  status_code    - Integer
-# Bin 7:  region         - String (16 chars)
-# Bin 8:  metadata       - Bytes (128 bytes)
-# Bin 9:  created_ts     - Integer (timestamp)
-# Bin 10: address        - String (48 chars)
-# Bin 11: latitude       - Double
-# Bin 12: updated_ts     - Integer (timestamp)
-# Bin 13: phone          - String (24 chars)
-# Bin 14: profile_data   - Bytes (64 bytes)
-# Bin 15: order_count    - Integer
-# Bin 16: last_action    - String (32 chars)
-# Bin 17: longitude      - Double
-# Bin 18: flags          - Integer
-# Bin 19: country_code   - String (16 chars)
-# Bin 20: version        - Integer
-
-# -----------------------------------------------------------------------------
-# Optional: Progress and reporting
-# -----------------------------------------------------------------------------
-
-# Print progress every N seconds
-# report-interval: 1
-
-# Latency histogram columns
-latency-columns: 4
-
-# Latency shift (affects histogram buckets)
-latency-shift: 3
-
-# Enable async operations for better performance
-# async: true
-# async-max-commands: 50
-# event-loops: 1
+  batch-size: 100
 
