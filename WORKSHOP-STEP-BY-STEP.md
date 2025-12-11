@@ -320,9 +320,9 @@ docker exec -it aerospike-client bash
    * **Discussion:** 
       * The cluster_size is now 2. 
       * The surviving nodes (aerospike-node-1 and aerospike-node-3) still hold all data copies (since RF=2), but the system is running under-replicated (`info`)
-      * Examine the migrations automaticlly repopulating the nodes to RF=2 (pending migrations)
+      * Examine the migrations automatically repopulating the nodes to RF=2 (pending migrations)
       * See the throughput across multiple (`show latencies`)
-      * Observe the client continueing reading and writing seamlessly.
+      * Observe the client continuing to read and write seamlessly.
 
 ## **Lab 5: Node Addition (Scale Up)**
 
