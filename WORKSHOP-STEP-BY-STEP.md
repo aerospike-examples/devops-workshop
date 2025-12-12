@@ -115,6 +115,7 @@ This workshop supports both **Community Edition** (free, no license required) an
 | Enterprise | Required | No | Advanced features (encryption, LDAP, etc.) |
 
 ### 1. Build and Start All Containers
+Optional: Place Aerospike package in package/ (aerospike-server-*_ubuntu24.04_*.tgz) to avoid downloading it during build
 
 **For Community Edition (default):**
 
@@ -122,18 +123,18 @@ This workshop supports both **Community Edition** (free, no license required) an
 # Navigate to the workshop directory
 cd /path/to/devops-workshop
 
-# Build and start (downloads Community Edition automatically)
+# Build and start (downloads Community Edition automatically if not in package/ directory)
 docker-compose up -d --build
 ```
 
 **For Enterprise Edition:**
 
 ```bash
-# 1. Place your Enterprise package in package/enterprise/
-#    (aerospike-server-enterprise_*_ubuntu24.04_*.tgz)
+# Navigate to the workshop directory
+cd /path/to/devops-workshop
 
-# 2. Build with Enterprise Edition
 export AEROSPIKE_EDITION=enterprise
+# Build and start (downloads Enterprise Edition automatically if not in package/ directory)
 docker-compose up -d --build
 ```
 

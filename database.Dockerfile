@@ -89,29 +89,26 @@ RUN mkdir -p /var/log/aerospike \
 # -----------------------------------------------------------------------------
 # Download or copy Aerospike Server package
 # -----------------------------------------------------------------------------
-# For Community Edition: Download from Aerospike
-# For Enterprise Edition: Copy from local package/enterprise/ directory
 SHELL ["/bin/bash", "-c"]
 
 # Copy enterprise packages if they exist (will be empty for community builds)
-COPY package/enterprise/ ${HOME}/enterprise-pkg/
+COPY package/ ${HOME}/package-pkg/
 
 RUN if [[ "$TARGETPLATFORM" == *"arm64"* ]] || [[ "$(uname -m)" == "aarch64" ]]; then \
         ARCH="aarch64"; \
     else \
         ARCH="x86_64"; \
     fi && \
-    echo "Building for ${AEROSPIKE_EDITION} edition (${ARCH})..." && \
-    if [[ "${AEROSPIKE_EDITION}" == "enterprise" ]]; then \
-        echo "Using Enterprise Edition from local package..." && \
-        mv ${HOME}/enterprise-pkg/*${ARCH}*.tgz ${HOME}/ 2>/dev/null || \
-        (echo "ERROR: Enterprise package not found for ${ARCH}. Place it in package/enterprise/" && exit 1); \
+    echo "Building for ${AEROSPIKE_EDITION^} edition ${AEROSPIKE_VERSION} (${ARCH})..." && \
+    if [[ -f ${HOME}/package-pkg/aerospike-server-${AEROSPIKE_EDITION}_${AEROSPIKE_VERSION}_tools-${TOOLS_VERSION}_ubuntu24.04_${ARCH}.tgz ]]; then \
+        echo "Using ${AEROSPIKE_EDITION^} Edition from local package..." && \
+        mv ${HOME}/package-pkg/aerospike-server-${AEROSPIKE_EDITION}_${AEROSPIKE_VERSION}_tools-${TOOLS_VERSION}_ubuntu24.04_${ARCH}.tgz ${HOME}/ 2>/dev/null || true; \
     else \
-        echo "Downloading Community Edition ${AEROSPIKE_VERSION}..." && \
-        wget -q "https://download.aerospike.com/artifacts/aerospike-server-community/${AEROSPIKE_VERSION}/aerospike-server-community_${AEROSPIKE_VERSION}_tools-${TOOLS_VERSION}_ubuntu24.04_${ARCH}.tgz" \
-             -O ${HOME}/aerospike-server-community_${AEROSPIKE_VERSION}_tools-${TOOLS_VERSION}_ubuntu24.04_${ARCH}.tgz; \
+        echo "Downloading ${AEROSPIKE_EDITION^} Edition ${AEROSPIKE_VERSION} (${ARCH})..." && \
+        wget -q "https://download.aerospike.com/artifacts/aerospike-server-${AEROSPIKE_EDITION}/${AEROSPIKE_VERSION}/aerospike-server-${AEROSPIKE_EDITION}_${AEROSPIKE_VERSION}_tools-${TOOLS_VERSION}_ubuntu24.04_${ARCH}.tgz" \
+                -O ${HOME}/aerospike-server-${AEROSPIKE_EDITION}_${AEROSPIKE_VERSION}_tools-${TOOLS_VERSION}_ubuntu24.04_${ARCH}.tgz; \
     fi && \
-    rm -rf ${HOME}/enterprise-pkg
+    rm -rf ${HOME}/package-pkg
 
 # -----------------------------------------------------------------------------
 # Set permissions
