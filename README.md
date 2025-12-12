@@ -56,7 +56,7 @@ docker exec -it aerospike-client bash
 
 To use Enterprise Edition:
 
-1. Place your package in `package/enterprise/`
+1. Place your package in `package/` (optional) 
 2. Place your `features.conf` in `etc/aerospike/`
 3. Build with: `AEROSPIKE_EDITION=enterprise docker-compose up -d --build`
 
