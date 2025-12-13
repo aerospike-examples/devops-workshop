@@ -26,11 +26,12 @@ x-aerospike-build: &aerospike-build
 
 services:
   # ---------------------------------------------------------------------------
-  # Database Node 1
+  # Database Node 1 (builds the shared image)
   # ---------------------------------------------------------------------------
   aerospike-node-1:
     build:
       <<: *aerospike-build
+    image: devops-workshop-aerospike-node:latest  # Tag the built image with this name
     container_name: aerospike-node-1
     hostname: aerospike-node-1
     
@@ -67,14 +68,14 @@ services:
     #   - "3001:3000"   # Service port
     #   - "3011:3001"   # Fabric port  
     #   - "3021:3002"   # Heartbeat port
-    #   - "3031:3003"   # Info port
+    #   - "3031:3003"   # Admin port
 
   # ---------------------------------------------------------------------------
-  # Database Node 2
+  # Database Node 2 (uses the shared image)
   # ---------------------------------------------------------------------------
   aerospike-node-2:
-    build:
-      <<: *aerospike-build
+    image: devops-workshop-aerospike-node:latest  # Reuse the image from node-1
+    pull_policy: build  # Don't pull, wait for it to be built
     container_name: aerospike-node-2
     hostname: aerospike-node-2
     privileged: true
@@ -92,6 +93,8 @@ services:
       - ./etc/aerospike:/home/aero_devops/aerospike-config:ro
       - node2-data:/opt/aerospike/data
     stop_signal: SIGRTMIN+3
+    depends_on:
+      - aerospike-node-1
     networks:
       devops-net:
         ipv4_address: 172.120.0.12
@@ -102,11 +105,11 @@ services:
     #   - "3032:3003"
 
   # ---------------------------------------------------------------------------
-  # Database Node 3
+  # Database Node 3 (uses the shared image)
   # ---------------------------------------------------------------------------
   aerospike-node-3:
-    build:
-      <<: *aerospike-build
+    image: devops-workshop-aerospike-node:latest  # Reuse the image from node-1
+    pull_policy: build  # Don't pull, wait for it to be built
     container_name: aerospike-node-3
     hostname: aerospike-node-3
     privileged: true
@@ -124,6 +127,8 @@ services:
       - ./etc/aerospike:/home/aero_devops/aerospike-config:ro
       - node3-data:/opt/aerospike/data
     stop_signal: SIGRTMIN+3
+    depends_on:
+      - aerospike-node-1
     networks:
       devops-net:
         ipv4_address: 172.120.0.13
