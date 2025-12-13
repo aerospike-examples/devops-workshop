@@ -142,9 +142,13 @@ docker-compose up -d --build
 ```
 
 This command:
-- Builds the Docker images (takes 2-5 minutes first time)
+- Builds the base image first (shared by database and client nodes)
+- Builds the database node image (reused by all 3 database containers)
+- Builds the client node image
 - Creates the network
 - Starts all 4 containers in the background
+
+**Note:** The build process is optimized - the base image containing common packages (systemd, utilities) is built once and shared by both database and client nodes, reducing build time and image size.
 
 ### 2. Verify Containers Are Running
 
@@ -197,20 +201,25 @@ docker exec -it aerospike-client bash
 ```
 devops-workshop/
 ├── compose.yaml           # Docker Compose configuration
+├── base.Dockerfile        # Shared base image (systemd, common packages)
 ├── database.Dockerfile    # Database node image definition
 ├── client.Dockerfile      # Client node image definition
+├── README.md              # Quick start guide
+├── WORKSHOP.md            # This documentation
 ├── etc/
 │   └── aerospike/
 │       ├── aerospike.conf      # Aerospike configuration
-│       └── features.conf       # License key (Enterprise Edition)
+│       └── features.conf       # License key (Enterprise Edition, optional)
 ├── asbench-configs/
-│   ├── insert-1m-records.sh     # Insert 1M records workload script
-│   ├── insert-1m-records.yaml   # Insert 1M records workload config
-│   ├── read-write-workload.sh   # Mixed read/write workload script
-│   └── read-write-workload.yaml # Mixed read/write workload config
-├── shared/                # Shared folder across all containers
-├── package/               # Aerospike installation packages
-└── WORKSHOP.md            # This documentation
+│   ├── README.md              # Benchmark configuration documentation
+│   ├── insert-1m-records.yaml  # Insert 1M records workload
+│   ├── insert-1m-records.sh   # Script to run insert workload
+│   ├── read-write-workload.yaml # Mixed read/write workload
+│   └── read-write-workload.sh  # Script to run read/write workload
+├── package/
+│   └── enterprise/            # Enterprise Edition packages (if using Enterprise)
+│       └── aerospike-server-enterprise_*.tgz
+└── shared/                     # Shared folder across all containers
 ```
 
 ### Shared Folders
@@ -626,16 +635,24 @@ ports:
 If you modify a Dockerfile, you must rebuild:
 
 ```bash
-# Rebuild specific image
-docker-compose build aerospike-node-1
+# Rebuild all images (base image will be rebuilt first automatically)
+docker compose build
 
-# Or rebuild all images
-docker-compose build
+# Or rebuild specific image
+docker compose build aerospike-node-1
 
 # Then restart
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 ```
+
+**Build Order:**
+- `base-image` is built first (shared base with systemd and common packages)
+- `aerospike-node-1` builds next (uses base-image, creates shared database image)
+- `aerospike-node-2` and `aerospike-node-3` reuse the database image (no rebuild needed)
+- `aerospike-client` builds last (uses base-image)
+
+**Note:** If you modify `base.Dockerfile`, all dependent images will be rebuilt automatically.
 
 ### Adding More Database Nodes
 
@@ -643,12 +660,8 @@ docker-compose up -d
 
    ```yaml
    aerospike-node-4:
-     build:
-       context: .
-       platforms:
-         - linux/amd64
-         - linux/arm64
-       dockerfile: database.Dockerfile
+     image: devops-workshop-aerospike-node:latest  # Reuses the shared database image
+     pull_policy: never
      container_name: aerospike-node-4
      hostname: aerospike-node-4
      privileged: true
@@ -662,7 +675,7 @@ docker-compose up -d
      volumes:
        - /sys/fs/cgroup:/sys/fs/cgroup:rw
        - ./shared:/home/aero_devops/shared
-       - ./etc/aerospike:/etc/aerospike
+       - ./etc/aerospike:/home/aero_devops/aerospike-config:ro
        - node4-data:/opt/aerospike/data
      stop_signal: SIGRTMIN+3
      networks:

@@ -17,6 +17,7 @@ git clone https://github.com/aerospike-examples/devops-workshop.git
 cd devops-workshop
 
 # Build and start (downloads Community Edition automatically)
+# The build process is optimized - base image is shared between all containers
 docker-compose up -d --build
 ```
 
